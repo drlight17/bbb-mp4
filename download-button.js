@@ -30,6 +30,18 @@ function if_url_exists(url, callback) {
     request.send("");
 }
 
+function get_filesize(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("HEAD", url, true);
+    xhr.onreadystatechange = function() {
+        if (this.readyState == this.DONE) {
+            file_size = parseInt(xhr.getResponseHeader("Content-Length"));
+            file_status = xhr.status;
+        }
+    };
+    xhr.send();
+}
+
 function dowload_button() {
     var element = document.getElementsByClassName("vjs-control-bar");
     var div = document.createElement("div");
@@ -37,9 +49,14 @@ function dowload_button() {
     var span = document.createElement("span");
     a.setAttribute("href", mp4_url);
     a.setAttribute("target", "_blank");
+    console.log(document.URL.split("/")[6] + ".mp4");
+    a.setAttribute("download", document.URL.split("/")[6] + ".mp4");
+    a.setAttribute("aria-label", "Скачать видео презентации. Размер файла "+Math.trunc(file_size/1024/1024)+" MB");
+    a.setAttribute("title", "Скачать видео презентации. Размер файла "+Math.trunc(file_size/1024/1024)+" MB");
+
     a.style.cssText = "text-decoration: none;color: white;";
     div.classList = "vjs-remaining-time vjs-time-control vjs-control";
-    a.appendChild(document.createTextNode("Download"));
+    a.appendChild(document.createTextNode("Скачать"));
     span.className = "";
     span.appendChild(a);
     div.appendChild(span);
@@ -90,6 +107,7 @@ const checkElement = async (selector) => {
 };
 checkElement(".vjs-control-bar").then((selector) => {
     console.log('Found "vjs-control-bar" \n Adding Download button..');
+    get_filesize(mp4_url);
     check_mp4();
     check_class_notes();
 });
